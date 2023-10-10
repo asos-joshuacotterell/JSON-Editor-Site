@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let originalData = null; // Store the original JSON data
     let editedData = null;   // Store the edited JSON data
     let originalFilename = null; // Store the original filename
+
+    const filterOptionMatchExact = document.getElementById("filterOptionMatchExact");
+
+    const shouldFilterExactMatch = () => document.querySelector('#filterOptionMatchExact').checked;
+
+    filterOptionMatchExact.addEventListener("change", () => {
+        renderFilteredJSON();
+    });
     
     jsonEditor.style.display = "none"; // Hide the editor until a file is loaded
 
@@ -20,11 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 try {
                     originalData = JSON.parse(e.target.result);
-                    // displayFormattedJSON(originalData, jsonDisplay);
                     editedData = deepClone(originalData); // Create a deep copy for editing
                     renderFilteredJSON();
 
-                    // Set saveButton to not hidden
                     jsonEditor.style.display = "block";
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
@@ -39,10 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
         jsonDisplay.innerHTML = ""; // Clear the display
 
         if (!filterText) {
-            // If no filter is provided, display the entire JSON
             displayFormattedJSON(originalData, jsonDisplay);
         } else {
-            // Filter the JSON data and display matching sections
             const filteredData = findMatchingSections(originalData, filterText);
             displayFormattedJSON(filteredData, jsonDisplay);
         }
@@ -53,10 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let currentData = data;
 
         for (const filterPart of filterParts) {
-            console.log(filterPart);
             currentData = findMatchingSection(currentData, filterPart);
             if (currentData === null) {
-                return null; // No matching data found, return null
+                return null;
             }
         }
 
@@ -68,7 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = {};
             for (const key in data) {
                 const value = data[key];
-                if (key.toLowerCase().includes(filter.toLowerCase())) {
+                const keyIsFilter = key.toLowerCase() === filter.toLowerCase();
+                const keyIncludesFilter = key.toLowerCase().includes(filter.toLowerCase());
+                if (keyIsFilter || (keyIncludesFilter && !shouldFilterExactMatch())) {
                     result[key] = value;
                 } else if (typeof value === "object") {
                     const nestedResult = findMatchingSection(value, filter);
