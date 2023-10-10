@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const jsonFileInput = document.getElementById("jsonFileInput");
+    const jsonEditor = document.getElementById("jsonEditor");
     const jsonDisplay = document.getElementById("jsonDisplay");
     const saveButton = document.getElementById("saveButton");
     const filterInput = document.getElementById("filterInput");
@@ -7,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let originalData = null; // Store the original JSON data
     let editedData = null;   // Store the edited JSON data
     let originalFilename = null; // Store the original filename
-
-    saveButton.style.display = "none"; // Hide the save button until JSON is loaded
+    
+    jsonEditor.style.display = "none"; // Hide the editor until a file is loaded
 
     jsonFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -24,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     renderFilteredJSON();
 
                     // Set saveButton to not hidden
-                    saveButton.style.display = "block";
+                    jsonEditor.style.display = "block";
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                 }
@@ -116,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     element.appendChild(checkbox);
                 } else {
                     const textInput = document.createElement("input");
-                    textInput.type = "text";
+                    textInput.type = typeof value;
                     textInput.value = value;
                     textInput.setAttribute("data-field-path", `${path}.${key}`);
                     element.appendChild(textInput);

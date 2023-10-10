@@ -1,7 +1,27 @@
-
 input {
-	width: 50%;
 	display: inline;
+	padding-top: 0.4em;
+	padding-bottom: 0.4em;
+	margin-top: 0.2em;
+	margin-bottom: 0.2em;
+}
+
+input[type=text] {
+	min-width: 600px;
+}
+
+input[type=number] {
+	width: auto;
+}
+
+input[type=checkbox] {
+	display: inline;
+	width: auto;
+}
+
+#filterInput {
+	width: auto;
+	display: block;
 }
 
 .json-key {
@@ -11,10 +31,3 @@ input {
 #saveButton {
 	display: block;
 }
- /* Create css match for all html inputs of type checkbox */
-input[type=checkbox] {
-	display: inline;
-	width: auto;
-}
-
-

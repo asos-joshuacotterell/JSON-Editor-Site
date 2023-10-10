@@ -8,12 +8,14 @@
 </head>
 <body>
     <input type="file" id="jsonFileInput" accept=".json">
-    <input type="text" id="filterInput">
-    <button id="saveButton">Save</button>
-    
-    <div id="jsonDisplay"></div>
-
-    <button id="saveButton">Save</button>
+    <div id="jsonEditor">
+        <input placeholder="Search... (separate with dots to do nested search)" type="text" id="filterInput">
+        <button id="saveButton">Save file</button>
+        
+        <div id="jsonDisplay"></div>
+        
+        <button id="saveButton">Save file</button>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
