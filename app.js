@@ -6,11 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let originalData = null; // Store the original JSON data
     let editedData = null;   // Store the edited JSON data
+    let originalFilename = null; // Store the original filename
+
+    saveButton.style.display = "none"; // Hide the save button until JSON is loaded
 
     jsonFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
 
         if (file) {
+            originalFilename = file.name; // Store the original filename
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
@@ -18,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     // displayFormattedJSON(originalData, jsonDisplay);
                     editedData = deepClone(originalData); // Create a deep copy for editing
                     renderFilteredJSON();
+
+                    // Set saveButton to not hidden
+                    saveButton.style.display = "block";
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                 }
@@ -42,51 +49,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function findMatchingSections(data, filter) {
         const filterParts = filter.split(".");
+        let currentData = data;
 
-        if (filterParts.length === 0) {
-            return data;
+        for (const filterPart of filterParts) {
+            console.log(filterPart);
+            currentData = findMatchingSection(currentData, filterPart);
+            if (currentData === null) {
+                return null; // No matching data found, return null
+            }
         }
 
-        const currentFilter = filterParts[0]; // Get the current filter part
-        const remainingFilter = filterParts.slice(1).join("."); // Get the remaining filter parts
+        return currentData;
+    }
 
+    function findMatchingSection(data, filter) {
         if (typeof data === "object" && data !== null) {
             const result = {};
-
             for (const key in data) {
                 const value = data[key];
-
-                if (key.startsWith(currentFilter)) {
-                    if (remainingFilter && typeof value === "object") {
-                        const nestedResult = findMatchingSections(value, remainingFilter);
-                        if (Object.keys(nestedResult).length > 0) {
-                            result[key] = nestedResult;
-                        }
-                    } else if (!remainingFilter) {
-                        // If no remaining filter, add the entire section
-                        result[key] = value;
+                if (key.toLowerCase().includes(filter.toLowerCase())) {
+                    result[key] = value;
+                } else if (typeof value === "object") {
+                    const nestedResult = findMatchingSection(value, filter);
+                    if (nestedResult !== null && Object.keys(nestedResult).length > 0) {
+                        result[key] = nestedResult;
                     }
                 }
             }
-
-            return result;
+            return Object.keys(result).length > 0 ? result : null;
         }
         return null;
-    }
-
-    function valueIncludesFilter(value, filter) {
-        // Check if a value (string, array, or object) includes the filter text
-        if (value === null) {
-            return false;
-        }
-        if (typeof value === "string" && value.includes(filter)) {
-            return true;
-        } else if (Array.isArray(value)) {
-            return value.some((item) => valueIncludesFilter(item, filter));
-        } else if (typeof value === "object") {
-            return Object.values(value).some((v) => valueIncludesFilter(v, filter));
-        }
-        return false;
     }
 
     function displayFormattedJSON(data, container, level = 1, path = "") {
@@ -96,16 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const value = data[key];
                 const element = document.createElement("div");
                 container.appendChild(element);
-                
-                var keyHeading;
-                if (level < 3) {
-                    keyHeading = document.createElement(`h${level}`);
-                } else {
-                    keyHeading = document.createElement("span");
-                }
-                    keyHeading.className = "json-key";
-                    keyHeading.textContent = `${path ? path + "." : ""}${key}: `;
-                    element.appendChild(keyHeading);
+
+                const keyHeading = document.createElement(level < 3 ? `h${level}` : "span");
+                keyHeading.className = "json-key";
+                keyHeading.textContent = `${path ? path + "." : ""}${key}: `;
+                element.appendChild(keyHeading);
                 if (value === null) {
                     const textInput = document.createElement("input");
                     textInput.type = "text";
@@ -120,6 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     textInput.value = value.join(", ");
                     textInput.setAttribute("data-field-path", `${path}.${key}`);
                     element.appendChild(textInput);
+                } else if (typeof value === "boolean") {
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.value = Boolean(value);
+                    checkbox.checked = Boolean(value);
+                    checkbox.setAttribute("data-field-path", `${path}.${key}`);
+                    element.appendChild(checkbox);
                 } else {
                     const textInput = document.createElement("input");
                     textInput.type = "text";
@@ -193,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
-        a.download = "edited-json.json";
+        a.download = originalFilename;
 
         // Trigger a click event to initiate the download
         document.body.appendChild(a);
@@ -203,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
-    
+
     filterInput.addEventListener("input", () => {
         renderFilteredJSON();
     });
