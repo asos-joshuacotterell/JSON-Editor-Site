@@ -1,6 +1,12 @@
 const getStoredTheme = () => localStorage.getItem('theme')
 const setStoredTheme = theme => localStorage.setItem('theme', theme)
 
+document.addEventListener('keyup', e => {
+  if (e.ctrlKey && e.key === '/') {
+    document.querySelector('#filterInput').focus()
+  }
+})
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const getPreferredTheme = () => {
@@ -28,20 +34,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const jsonDisplay = document.getElementById("jsonDisplay");
     const saveButton = document.getElementById("saveButton");
     const filterInput = document.getElementById("filterInput");
-
+    
     let originalData = null; // Store the original JSON data
     let editedData = null;   // Store the edited JSON data
     let originalFilename = null; // Store the original filename
 
+    
     const filterOptionMatchExact = document.getElementById("filterOptionMatchExact");
-
+    document.getElementById("filterOptionMatchExactBtn").onclick = () => {
+        filterOptionMatchExact.click();
+    };
+    
     const shouldFilterExactMatch = () => document.querySelector('#filterOptionMatchExact').checked;
-
+    
     filterOptionMatchExact.addEventListener("change", () => {
         renderFilteredJSON();
     });
     
-    jsonEditor.style.display = "none"; // Hide the editor until a file is loaded
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && e.key === 'e') {
+          e.preventDefault()
+          filterOptionMatchExact.click();
+        }
+    });
+   
+
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && e.key === 'f') {
+          e.preventDefault()
+          jsonFileInput.click();
+        }
+    });
+    
+    hideJsonEditor();
 
     jsonFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -52,10 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 try {
                     originalData = JSON.parse(e.target.result);
+                    showJsonEditor();
                     editedData = deepClone(originalData); // Create a deep copy for editing
                     renderFilteredJSON();
-
-                    jsonEditor.style.display = "block";
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
                 }
@@ -63,6 +87,14 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.readAsText(file);
         }
     });
+
+    function hideJsonEditor() {
+        jsonEditor.style.display = "none";
+    };
+
+    function showJsonEditor() {
+        jsonEditor.style.display = "block";
+    };
 
     function renderFilteredJSON() {
         const filterText = filterInput.value.trim();
@@ -135,7 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (typeof value === "boolean") {
                     element.appendChild(createBooleanInput(`${path}.${key}`, Boolean(value)));
                 } else {
-                    console.log(typeof value);
                     element.appendChild(createInputContainer(`${path}.${key}`, value));
                 }
             });

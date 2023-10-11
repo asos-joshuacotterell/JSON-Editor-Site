@@ -11,40 +11,28 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg fixed-top bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand">JSON Editor</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
-                aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarScroll">
-                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-                </ul>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <form id="search-box" class="d-flex" role="search">
+                    <input id="filterInput" class="form-control me-2  w-100" type="search"
+                            placeholder="Search... (Ctrl + /)" aria-label="Search">
+                    <span id="filterOptionMatchExactBtn" class="btn btn-dark form-control"><input type="checkbox" id="filterOptionMatchExact"> Match exact (Ctrl + E)</span>
+                </form>
+                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;"></ul>
                 <form class="d-flex" role="upload">
-                    <input class="form-control me-2" type="file" id="jsonFileInput" accept=".json"
-                        aria-label="Upload JSON file" />
-                        <button id="saveButton" class="btn btn-outline-success" type="save">Save</button>
+                    <input class="form-control me-2" type="file" id="jsonFileInput" accept=".json" aria-label="Upload JSON file" />
+                    <button id="saveButton" class="btn btn-outline-success" type="save">Save</button>
                 </form>
             </div>
         </div>
     </nav>
 
     <div id="jsonEditor">
-        <!-- Search -->
-        <div id="search-box" class="row g-3 align-items-center">
-            <div class="col-auto">
-                <label class="col-form-label">Search</label>
-            </div>
-            <div class="col-auto">
-                <input id="filterInput" class="form-control me-2" type="search" placeholder="Search... (separate with dots to do nested search)" aria-label="Search">
-            </div>
-            <div class="col-auto">
-                <span><input type="checkbox" id="filterOptionMatchExact" value="true"> Match exact</span>
-            </div>
-        </div>
-        <!-- Search End -->
-        <hr />
         <div id="jsonDisplay"></div>
     </div>
     <script src="app.js"></script>

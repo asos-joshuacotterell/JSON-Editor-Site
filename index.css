@@ -1,29 +1,20 @@
-#search-box {
-	margin: 0.2em 0 1em 0;
+#jsonEditor {
+	margin-top: 3em;
 }
 
 #jsonDisplay {
-	padding: 0 1em;
+	padding: 1em 1em;
 }
 
-input[type=search] {
-	min-width: 400px;
+@media screen and (min-width: 1200px) {
+	input[type=search] {
+		min-width: 400px;
+	}
 }
 
-/* input[type=text] {
-	min-width: 600px;
-}
-
-input[type=string] {
-	min-width: 600px;
-} */
 
 input[type=number] {
 	width: auto;
-}
-
-#filterInput {
-	display: block;
 }
 
 .json-key {
