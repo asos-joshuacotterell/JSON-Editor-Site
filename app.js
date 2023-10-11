@@ -1,4 +1,28 @@
+const getStoredTheme = () => localStorage.getItem('theme')
+const setStoredTheme = theme => localStorage.setItem('theme', theme)
+
 document.addEventListener("DOMContentLoaded", () => {
+
+    const getPreferredTheme = () => {
+        const storedTheme = getStoredTheme()
+        if (storedTheme) {
+          return storedTheme
+        }
+    
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+    
+      function setTheme() {
+        const theme = getPreferredTheme();
+        if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-bs-theme', 'dark')
+        } else {
+          document.documentElement.setAttribute('data-bs-theme', theme)
+        }
+      }
+    
+    setTheme()
+
     const jsonFileInput = document.getElementById("jsonFileInput");
     const jsonEditor = document.getElementById("jsonEditor");
     const jsonDisplay = document.getElementById("jsonDisplay");
@@ -99,6 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     keyHeading.className = "json-key";
                     keyHeading.textContent = `${path ? path + "." : ""}${key}`;
                     element.appendChild(keyHeading);
+                }
+                if (level == 2) {
+                    const hr = document.createElement("hr");
+                    element.appendChild(hr);
                 }
                 if (value === null) {
                     element.appendChild(createInputContainer(`${path}.${key}`, "null"));
