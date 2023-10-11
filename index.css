@@ -1,9 +1,21 @@
+#search-box {
+	margin: 0.2em 0 1em 0;
+}
+
+#jsonDisplay {
+	padding: 0 1em;
+}
+
 input {
 	display: inline;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
 	margin-top: 0.2em;
 	margin-bottom: 0.2em;
+}
+
+input[type=search] {
+	min-width: 400px;
 }
 
 input[type=text] {
@@ -20,14 +32,9 @@ input[type=checkbox] {
 }
 
 #filterInput {
-	width: auto;
 	display: block;
 }
 
 .json-key {
 	display: inline;
-}
-
-#saveButton {
-	display: block;
 }

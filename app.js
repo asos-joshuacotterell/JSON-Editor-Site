@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const keyHeading = document.createElement(level < 3 ? `h${level}` : "span");
                 keyHeading.className = "json-key";
-                keyHeading.textContent = `${path ? path + "." : ""}${key}: `;
+                keyHeading.textContent = `${path ? path + "." : ""}${key}`;
                 element.appendChild(keyHeading);
                 if (value === null) {
                     const textInput = document.createElement("input");
