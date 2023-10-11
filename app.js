@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     filterOptionMatchExact.addEventListener("change", () => {
         renderFilteredJSON();
     });
+
+    filterInput.addEventListener("input", () => {
+        renderFilteredJSON();
+    });
     
     document.addEventListener('keydown', e => {
         if (e.ctrlKey && e.key === 'e') {
@@ -151,18 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 const element = document.createElement("div");
                 container.appendChild(element);
                 if (level < 3) {
-                    const keyHeading = document.createElement(level < 3 ? `h${level}` : "span");
-                    keyHeading.className = "json-key";
-                    keyHeading.textContent = `${path ? path + "." : ""}${key}`;
-                    element.appendChild(keyHeading);
+                    element.append(createHeading(`h${level}`, `${path ? path + "." : ""}${key}`));
                 }
                 if (level == 2) {
-                    const hr = document.createElement("hr");
-                    element.appendChild(hr);
+                    element.appendChild(document.createElement("hr"));
                 }
-                if (value === null) {
-                    element.appendChild(createInputContainer(`${path}.${key}`, "null"));
-                } else if (typeof value === "object") {
+
+                if (typeof value === "object") {
                     displayFormattedJSON(value, element, level + 1, `${path ? path + "." : ""}${key}`);
                 } else if (typeof value === "boolean") {
                     element.appendChild(createBooleanInput(`${path}.${key}`, Boolean(value)));
@@ -170,86 +169,80 @@ document.addEventListener("DOMContentLoaded", () => {
                     element.appendChild(createInputContainer(`${path}.${key}`, value));
                 }
             });
-
-            const textInputs = container.querySelectorAll("input[type='text']");
-            textInputs.forEach((input) => {
-                input.addEventListener("input", () => {
-                    const fieldPath = input.getAttribute("data-field-path");
-                    const newValue = input.value;
-                    setEditedValue(editedData, fieldPath, newValue);
-                });
-            });
         }
+    }
 
-        function createInputContainer(label, value) {
-            const inputLabel = document.createElement("span");
-            inputLabel.className = "input-group-text";
-            inputLabel.id = "basic-addon3";
-            inputLabel.textContent = label;
+    function createHeading(sizedHeader, value) {
+        const keyHeading = document.createElement(sizedHeader);
+        keyHeading.className = "json-key";
+        keyHeading.textContent = value;
+        return keyHeading;
+    }
 
-            const textInput = document.createElement("input");
-            textInput.type = typeof value;
-            textInput.value = value;
-            textInput.className = "form-control";
-            textInput.setAttribute("data-field-path", label);
+    function createInputContainer(label, value) {
+        const inputLabel = document.createElement("span");
+        inputLabel.className = "input-group-text";
+        inputLabel.id = "basic-addon3";
+        inputLabel.textContent = label;
 
-            // Create input div 
-            const inputDiv = document.createElement("div");
-            inputDiv.className = "input-group";
-            inputDiv.appendChild(inputLabel);
-            inputDiv.appendChild(textInput);
-            
-            // Create outer div
-            const div = document.createElement("div");
-            div.className = "mb-3";
-            div.appendChild(inputDiv);
-            return div;
-        }
-
-        function createBooleanInput(label, value) {
-            const inputLabel = document.createElement("label");
-            inputLabel.textContent = label;
-            inputLabel.className = "form-check-label";
-
-            const input = document.createElement("input");
-            input.className = "form-check-input";
-            input.type = "checkbox";
-            input.checked = value;
-            input.querySelector.checked = value;
-            input.value = value;
-            input.setAttribute("data-field-path", label);
-
-            const div = document.createElement("div");
-            div.className = "form-check form-switch";
-            div.appendChild(inputLabel);
-            div.appendChild(input);
-            
-            return div;
-        }
-
-        // Add an event listener to text input fields for editing
-        const textInputs = container.querySelectorAll("input[type='text']");
-        textInputs.forEach((input) => {
-            input.addEventListener("input", () => {
-                const fieldPath = input.getAttribute("data-field-path");
-                const newValue = input.value;
-                setEditedValue(editedData, fieldPath, newValue);
-            });
+        const textInput = document.createElement("input");
+        textInput.type = typeof value;
+        textInput.value = value;
+        textInput.className = "form-control";
+        textInput.setAttribute("data-field-path", label);
+        textInput.addEventListener("input", () => {
+            const fieldPath = textInput.getAttribute("data-field-path");
+            const newValue = (typeof value === "number") ? Number(textInput.value) : textInput.value;
+            setEditedValue(editedData, fieldPath, newValue);
         });
+
+        const inputDiv = document.createElement("div");
+        inputDiv.className = "input-group";
+        inputDiv.appendChild(inputLabel);
+        inputDiv.appendChild(textInput);
+        
+        const div = document.createElement("div");
+        div.className = "mb-3";
+        div.appendChild(inputDiv);
+        return div;
+    }
+
+    function createBooleanInput(label, value) {
+        const inputLabel = document.createElement("label");
+        inputLabel.textContent = label;
+        inputLabel.className = "form-check-label";
+
+        const input = document.createElement("input");
+        input.className = "form-check-input";
+        input.type = "checkbox";
+        input.checked = value;
+        input.value = value;
+        input.addEventListener("change", () => {
+            const fieldPath = input.getAttribute("data-field-path");
+            const newValue = input.checked;
+            setEditedValue(editedData, fieldPath, newValue);
+        });
+        input.setAttribute("data-field-path", label);
+
+        const div = document.createElement("div");
+        div.className = "form-check form-switch";
+        div.appendChild(inputLabel);
+        div.appendChild(input);
+        
+        return div;
     }
 
     function setEditedValue(data, fieldPath, newValue) {
-        // Function to set edited values in the editedData object
         const pathParts = fieldPath.split(".");
         let currentObj = data;
         for (let i = 0; i < pathParts.length - 1; i++) {
             currentObj = currentObj[pathParts[i]];
         }
+        console.log(`Setting ${pathParts[pathParts.length - 1]} to ${newValue}.`);
         currentObj[pathParts[pathParts.length - 1]] = newValue;
     }
 
     function deepClone(obj) {
-        // Deep clone a JavaScript object
         if (obj === null || typeof obj !== "object") {
             return obj;
         }
@@ -270,29 +263,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     saveButton.addEventListener("click", () => {
-        // When the save button is clicked, convert the editedData to JSON
         const editedDataJSON = JSON.stringify(editedData, null, 2);
 
-        // Create a Blob object and create a URL for it
         const blob = new Blob([editedDataJSON], { type: "application/json" });
         const url = URL.createObjectURL(blob);
 
-        // Create a temporary <a> element to trigger the download
         const a = document.createElement("a");
-        a.style.display = "none";
         a.href = url;
         a.download = originalFilename;
-
-        // Trigger a click event to initiate the download
-        document.body.appendChild(a);
         a.click();
-
-        // Clean up
-        document.body.removeChild(a);
         URL.revokeObjectURL(url);
-    });
-
-    filterInput.addEventListener("input", () => {
-        renderFilteredJSON();
     });
 });
