@@ -6,28 +6,19 @@
 	padding: 0 1em;
 }
 
-input {
-	display: inline;
-	padding-top: 0.4em;
-	padding-bottom: 0.4em;
-	margin-top: 0.2em;
-	margin-bottom: 0.2em;
-}
-
 input[type=search] {
 	min-width: 400px;
 }
 
-input[type=text] {
+/* input[type=text] {
 	min-width: 600px;
 }
 
-input[type=number] {
-	width: auto;
-}
+input[type=string] {
+	min-width: 600px;
+} */
 
-input[type=checkbox] {
-	display: inline;
+input[type=number] {
 	width: auto;
 }
 

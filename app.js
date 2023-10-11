@@ -94,38 +94,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 const value = data[key];
                 const element = document.createElement("div");
                 container.appendChild(element);
-
-                const keyHeading = document.createElement(level < 3 ? `h${level}` : "span");
-                keyHeading.className = "json-key";
-                keyHeading.textContent = `${path ? path + "." : ""}${key}`;
-                element.appendChild(keyHeading);
+                if (level < 3) {
+                    const keyHeading = document.createElement(level < 3 ? `h${level}` : "span");
+                    keyHeading.className = "json-key";
+                    keyHeading.textContent = `${path ? path + "." : ""}${key}`;
+                    element.appendChild(keyHeading);
+                }
                 if (value === null) {
-                    const textInput = document.createElement("input");
-                    textInput.type = "text";
-                    textInput.value = "null";
-                    textInput.setAttribute("data-field-path", `${path}.${key}`);
-                    element.appendChild(textInput);
+                    element.appendChild(createInputContainer(`${path}.${key}`, "null"));
                 } else if (typeof value === "object") {
                     displayFormattedJSON(value, element, level + 1, `${path ? path + "." : ""}${key}`);
-                } else if (Array.isArray(value)) {
-                    const textInput = document.createElement("input");
-                    textInput.type = "text";
-                    textInput.value = value.join(", ");
-                    textInput.setAttribute("data-field-path", `${path}.${key}`);
-                    element.appendChild(textInput);
                 } else if (typeof value === "boolean") {
-                    const checkbox = document.createElement("input");
-                    checkbox.type = "checkbox";
-                    checkbox.value = Boolean(value);
-                    checkbox.checked = Boolean(value);
-                    checkbox.setAttribute("data-field-path", `${path}.${key}`);
-                    element.appendChild(checkbox);
+                    element.appendChild(createBooleanInput(`${path}.${key}`, Boolean(value)));
                 } else {
-                    const textInput = document.createElement("input");
-                    textInput.type = typeof value;
-                    textInput.value = value;
-                    textInput.setAttribute("data-field-path", `${path}.${key}`);
-                    element.appendChild(textInput);
+                    console.log(typeof value);
+                    element.appendChild(createInputContainer(`${path}.${key}`, value));
                 }
             });
 
@@ -137,6 +120,52 @@ document.addEventListener("DOMContentLoaded", () => {
                     setEditedValue(editedData, fieldPath, newValue);
                 });
             });
+        }
+
+        function createInputContainer(label, value) {
+            const inputLabel = document.createElement("span");
+            inputLabel.className = "input-group-text";
+            inputLabel.id = "basic-addon3";
+            inputLabel.textContent = label;
+
+            const textInput = document.createElement("input");
+            textInput.type = typeof value;
+            textInput.value = value;
+            textInput.className = "form-control";
+            textInput.setAttribute("data-field-path", label);
+
+            // Create input div 
+            const inputDiv = document.createElement("div");
+            inputDiv.className = "input-group";
+            inputDiv.appendChild(inputLabel);
+            inputDiv.appendChild(textInput);
+            
+            // Create outer div
+            const div = document.createElement("div");
+            div.className = "mb-3";
+            div.appendChild(inputDiv);
+            return div;
+        }
+
+        function createBooleanInput(label, value) {
+            const inputLabel = document.createElement("label");
+            inputLabel.textContent = label;
+            inputLabel.className = "form-check-label";
+
+            const input = document.createElement("input");
+            input.className = "form-check-input";
+            input.type = "checkbox";
+            input.checked = value;
+            input.querySelector.checked = value;
+            input.value = value;
+            input.setAttribute("data-field-path", label);
+
+            const div = document.createElement("div");
+            div.className = "form-check form-switch";
+            div.appendChild(inputLabel);
+            div.appendChild(input);
+            
+            return div;
         }
 
         // Add an event listener to text input fields for editing
