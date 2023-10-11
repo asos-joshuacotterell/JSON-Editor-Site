@@ -30,16 +30,15 @@ document.addEventListener("DOMContentLoaded", () => {
     setTheme()
 
     const jsonFileInput = document.getElementById("jsonFileInput");
-    const jsonEditor = document.getElementById("jsonEditor");
     const jsonDisplay = document.getElementById("jsonDisplay");
     const saveButton = document.getElementById("saveButton");
     const filterInput = document.getElementById("filterInput");
+    const filterDataList = document.getElementById("filterDataList");
     
-    let originalData = null; // Store the original JSON data
-    let editedData = null;   // Store the edited JSON data
-    let originalFilename = null; // Store the original filename
+    let originalData = null;
+    let editedData = null;
+    let originalFilename = null;
 
-    
     const filterOptionMatchExact = document.getElementById("filterOptionMatchExact");
     document.getElementById("filterOptionMatchExactBtn").onclick = () => {
         filterOptionMatchExact.click();
@@ -70,8 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    hideJsonEditor();
-
     jsonFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
 
@@ -81,8 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 try {
                     originalData = JSON.parse(e.target.result);
-                    showJsonEditor();
                     editedData = deepClone(originalData); // Create a deep copy for editing
+                    appendFilterSuggestions();
                     renderFilteredJSON();
                 } catch (error) {
                     console.error("Error parsing JSON:", error);
@@ -92,17 +89,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    function hideJsonEditor() {
-        jsonEditor.style.display = "none";
-    };
-
-    function showJsonEditor() {
-        jsonEditor.style.display = "block";
-    };
+    function appendFilterSuggestions() {
+        const options = Object.keys(originalData).map(key => {
+            return `<option value="${key}">${key}</option>`;
+        }).join('');
+        filterDataList.innerHTML = options;
+    }
 
     function renderFilteredJSON() {
         const filterText = filterInput.value.trim();
-        jsonDisplay.innerHTML = ""; // Clear the display
+        jsonDisplay.innerHTML = "";
 
         if (!filterText) {
             displayFormattedJSON(originalData, jsonDisplay);
@@ -154,12 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const value = data[key];
                 const element = document.createElement("div");
                 container.appendChild(element);
-                if (level < 3) {
-                    element.append(createHeading(`h${level}`, `${path ? path + "." : ""}${key}`));
-                }
-                if (level == 2) {
-                    element.appendChild(document.createElement("hr"));
-                }
+
+                (level < 3) ? element.append(createHeading(`h${level}`, `${path ? path + "." : ""}${key}`)) : {};
+                (level == 2) ? element.appendChild(document.createElement("hr")) : {};
 
                 if (typeof value === "object") {
                     displayFormattedJSON(value, element, level + 1, `${path ? path + "." : ""}${key}`);
