@@ -1,12 +1,6 @@
 const getStoredTheme = () => localStorage.getItem('theme')
 const setStoredTheme = theme => localStorage.setItem('theme', theme)
 
-document.addEventListener('keyup', e => {
-  if (e.ctrlKey && e.key === '/') {
-    document.querySelector('#filterInput').focus()
-  }
-})
-
 document.addEventListener("DOMContentLoaded", () => {
 
     const getPreferredTheme = () => {
@@ -38,6 +32,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let originalData = null;
     let editedData = null;
     let originalFilename = null;
+
+    document.addEventListener('keyup', e => {
+        if (e.key === '/') {
+            if (!document.querySelector('input:focus')) {
+                filterInput.focus()
+            }
+        }
+    })
 
     const filterOptionMatchExact = document.getElementById("filterOptionMatchExact");
     document.getElementById("filterOptionMatchExactBtn").onclick = () => {
@@ -90,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function appendFilterSuggestions() {
+        filterDataList.innerHTML = "";
         const options = Object.keys(originalData).map(key => {
             return `<option value="${key}">${key}</option>`;
         }).join('');
@@ -97,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderFilteredJSON() {
+        if (!originalData) { return }
         const filterText = filterInput.value.trim();
         jsonDisplay.innerHTML = "";
 
