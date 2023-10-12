@@ -24,8 +24,10 @@
                         list="filterDataList" aria-label="Search">
                     <datalist id="filterDataList">
                     </datalist>
-                    <span id="filterOptionMatchExactBtn" class="btn btn-dark form-control"><input type="checkbox"
+                    <span id="filterOptionMatchExactBtn" class="btn btn-outline-secondary form-control"><input type="checkbox"
                             id="filterOptionMatchExact"> Match exact (Ctrl + E)</span>
+                    <!-- <span id="filterOptionMatchExactBtn" class="btn btn-dark btn-sm">Change All</span> -->
+                    <!-- <button id="changeAllBtn" type="button" class="btn btn-light btn-sm">Change All</button> -->
                 </form>
                 <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;"></ul>
                 <form class="d-flex" role="upload">
@@ -37,7 +39,13 @@
         </div>
     </nav>
 
-    <div id="jsonDisplay"></div>
+    <div id="changeAllSection" class="input-group mb-3 w-25">
+        <input id="changeAllNewValueInput" type="text" class="form-control" placeholder="New value..." aria-label="Change to new value" aria-describedby="button-addon2">
+        <button id="changeAllBtn" class="btn btn-outline-primary" type="button">Change All</button>
+    </div>
+
+    <div id="jsonDisplay">
+    </div>
 
     <script src="app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

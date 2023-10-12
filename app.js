@@ -29,6 +29,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterInput = document.getElementById("filterInput");
     const filterDataList = document.getElementById("filterDataList");
     
+    const changeAllSection = document.getElementById("changeAllSection");
+    const changeAllNewValueInput = document.getElementById("changeAllNewValueInput");
+    const changeAllBtn = document.getElementById("changeAllBtn");
+    
     let originalData = null;
     let editedData = null;
     let originalFilename = null;
@@ -62,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
           filterOptionMatchExact.click();
         }
     });
-   
 
     document.addEventListener('keydown', e => {
         if (e.ctrlKey && e.key === 'f') {
@@ -70,7 +73,61 @@ document.addEventListener("DOMContentLoaded", () => {
           jsonFileInput.click();
         }
     });
-    
+
+    const typeMap = new Map([
+        ['string', text => String(text)],
+        ['number', text => Number(text)],
+        ['boolean', text => {
+            if (text.toLowerCase() === 'true') return true;
+            if (text.toLowerCase() === 'false') return false;
+            return Boolean(text);
+        }]
+    ]);
+
+    changeAllSection.style.display = "none";
+    changeAllBtn.onclick = () => {
+        let desiredNewValue = changeAllNewValueInput.value;
+        const filteredData = findMatchingSections(originalData, filterInput.value.trim());
+        const mappedFilteredData = jsonToTuples(filteredData);
+        const allValueTypes = getNestedValueTypes(mappedFilteredData);
+        if (allValueTypes.size === 1) {
+            mappedFilteredData.forEach((newValuePair) => {
+                const [path, oldValue] = newValuePair;
+                const newValue = typeMap.get(typeof oldValue)(desiredNewValue);
+                if (typeof oldValue !== typeof newValue) {
+                    alert("Tried changing value to a different type. This is not allowed.");
+                    return;
+                }
+                setEditedValue(editedData, path, newValue);
+            });
+            renderFilteredJSON();
+        } else {
+            alert("All values found with the filter must be the same type.");
+        }
+    }
+
+    function jsonToTuples(json) {
+        // TODO: Maybe ensure here that it only adds keys to values that are of the same type.
+        const tuples = [];
+      
+        function traverse(obj, path = '') {
+          Object.keys(obj).forEach(key => {
+            const value = obj[key];
+            
+            if (typeof value === 'object') {
+                traverse(value, `${path ? path + "." : ""}${key}`);
+            } else {
+                const tuple = [`${path ? path + "." : ""}${key}`, value];
+                tuples.push(tuple);  
+            }
+          });
+        }
+        traverse(json);
+        return tuples;
+      }
+
+    getNestedValueTypes = (data) => new Set(data.flatMap(v => typeof v[1]));
+
     jsonFileInput.addEventListener("change", (event) => {
         const file = event.target.files[0];
 
@@ -100,15 +157,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderFilteredJSON() {
-        if (!originalData) { return }
+        if (!editedData) { return }
         const filterText = filterInput.value.trim();
         jsonDisplay.innerHTML = "";
 
         if (!filterText) {
-            displayFormattedJSON(originalData, jsonDisplay);
+            displayFormattedJSON(editedData, jsonDisplay);
+            changeAllSection.style.display = "none";
         } else {
-            const filteredData = findMatchingSections(originalData, filterText);
+            const filteredData = findMatchingSections(editedData, filterText);
             displayFormattedJSON(filteredData, jsonDisplay);
+            changeAllSection.style.display = "";
         }
     }
 
