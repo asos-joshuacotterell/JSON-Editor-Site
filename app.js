@@ -84,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }]
     ]);
 
-    changeAllSection.style.display = "none";
     changeAllBtn.onclick = () => {
         let desiredNewValue = changeAllNewValueInput.value;
         const filteredData = findMatchingSections(originalData, filterInput.value.trim());
@@ -216,8 +215,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 (level < 3) ? element.append(createHeading(`h${level}`, `${path ? path + "." : ""}${key}`)) : {};
                 (level == 2) ? element.appendChild(document.createElement("hr")) : {};
-
-                if (typeof value === "object") {
+                
+                if (Array.isArray(value)) {
+                    element.appendChild(createHeading(`h${level + 1}`, `${path ? path + "." : ""}${key}`));
+                    const arrayContainer = document.createElement("div");
+                    arrayContainer.className = "array-container";
+                    value.forEach((arrayValue, index) => {
+                        if (typeof arrayValue === "object" && arrayValue !== null) {
+                            const arrayListContainer = document.createElement("div");
+                            arrayListContainer.className = "mb-2";
+                            displayFormattedJSON(arrayValue, arrayListContainer, level + 1, `${path ? path + "." : ""}${key}.${index}`);
+                            arrayContainer.appendChild(arrayListContainer);
+                        } else {
+                            // console.log(arrayValue);
+                            arrayContainer.appendChild(createInputContainer(`${path}.${key}.${index}`, arrayValue));
+                        }
+                    });
+                    element.appendChild(arrayContainer);
+                } else if (typeof value === "object") {
                     displayFormattedJSON(value, element, level + 1, `${path ? path + "." : ""}${key}`);
                 } else if (typeof value === "boolean") {
                     element.appendChild(createBooleanInput(`${path}.${key}`, Boolean(value)));
@@ -230,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function createHeading(sizedHeader, value) {
         const keyHeading = document.createElement(sizedHeader);
-        keyHeading.className = "json-key";
+        keyHeading.className = "json-key mt-2 mb-2";
         keyHeading.textContent = value;
         return keyHeading;
     }
@@ -294,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 0; i < pathParts.length - 1; i++) {
             currentObj = currentObj[pathParts[i]];
         }
-        console.log(`Setting ${pathParts[pathParts.length - 1]} to ${newValue}.`);
+        // console.log(`Setting ${pathParts[pathParts.length - 1]} to ${newValue}.`);
         currentObj[pathParts[pathParts.length - 1]] = newValue;
     }
 

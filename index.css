@@ -17,6 +17,7 @@ input[type=number] {
 	max-width: 150px;
 }
 
-.json-key {
-	display: inline;
+/* Match any input underneath class 'array-container' */
+.array-container .mb-3 {
+	margin-bottom: 0!important;
 }
